@@ -1,0 +1,80 @@
+# =============================================================================
+# MCP Servers - Git Ignore
+# =============================================================================
+
+# Environment files (contain secrets)
+.env
+*.env.local
+
+# Cloned MCP Server Repositories
+# These are cloned from GitHub and should not be pushed to the main repo
+brave-search-mcp-server/
+gnomad-mcp/
+genome_mcp/
+paperscraper_mcp/
+NCBI-Datasets-MCP-Server/
+mcp-db-server/
+rust-mcp-filesystem/
+bio_local/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+venv/
+.venv/
+ENV/
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Rust
+target/
+Cargo.lock
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Docker
+*.log
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.bak
+
+# Data files
+*.vcf
+*.vcf.gz
+*.bam
+*.sam
+*.fasta
+*.fa
+*.fastq
+*.fq

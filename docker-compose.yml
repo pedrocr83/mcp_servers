@@ -1,0 +1,201 @@
+# MCP Servers - Unified Docker Compose
+# All bioinformatics MCP servers consolidated
+# Use profiles to enable/disable services via COMPOSE_PROFILES env var
+
+services:
+  # ===========================================
+  # BRAVE SEARCH MCP SERVER
+  # Web search and news intelligence
+  # ===========================================
+  brave-search-mcp:
+    build:
+      context: ./brave-search-mcp-server
+      dockerfile: Dockerfile
+    container_name: brave-search-mcp
+    restart: unless-stopped
+    profiles:
+      - brave
+      - all
+    cap_drop:
+      - all
+    deploy:
+      restart_policy:
+        condition: any
+        delay: 5s
+    environment:
+      - BRAVE_API_KEY=${BRAVE_API_KEY}
+      - BRAVE_MCP_TRANSPORT=http
+      - BRAVE_MCP_PORT=7000
+      - BRAVE_MCP_HOST=0.0.0.0
+      - BRAVE_MCP_LOG_LEVEL=info
+    init: true
+    ports:
+      - "7000:7000"
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - mcp-network
+
+  # ===========================================
+  # GNOMAD MCP SERVER
+  # Genomic variant population data
+  # ===========================================
+  gnomad-mcp:
+    build:
+      context: ./gnomad-mcp
+      dockerfile: Dockerfile
+    container_name: gnomad-mcp
+    restart: unless-stopped
+    profiles:
+      - gnomad
+      - all
+    environment:
+      - FASTMCP_TRANSPORT=sse
+      - FASTMCP_PORT=7001
+      - FASTMCP_HOST=0.0.0.0
+    ports:
+      - "7001:7001"
+    networks:
+      - mcp-network
+
+  # ===========================================
+  # BIO LOCAL MCP SERVER
+  # Local bioinformatics engine with bcftools
+  # ===========================================
+  bio-local-mcp:
+    build:
+      context: ./bio_local
+      dockerfile: Dockerfile
+    container_name: bio-local-mcp
+    restart: unless-stopped
+    profiles:
+      - biolocal
+      - all
+    environment:
+      - FASTMCP_TRANSPORT=sse
+      - FASTMCP_PORT=7002
+      - FASTMCP_HOST=0.0.0.0
+      - GENOME_DATA_PATH=/data/genomes
+    volumes:
+      - ${GENOME_DATA_PATH}:/data/genomes:ro
+    ports:
+      - "7002:7002"
+    networks:
+      - mcp-network
+
+  # ===========================================
+  # GENOME MCP SERVER
+  # ClinVar genomic data queries
+  # ===========================================
+  genome-mcp:
+    build:
+      context: ./genome_mcp
+      dockerfile: Dockerfile
+    container_name: genome-mcp
+    restart: unless-stopped
+    profiles:
+      - genome
+      - all
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PORT=7003
+    ports:
+      - "7003:7003"
+    networks:
+      - mcp-network
+
+  # ===========================================
+  # PAPERSCRAPER MCP SERVER
+  # Literature and research paper search
+  # ===========================================
+  paperscraper-mcp:
+    build:
+      context: ./paperscraper_mcp
+      dockerfile: Dockerfile
+    container_name: paperscraper-mcp
+    restart: unless-stopped
+    profiles:
+      - paperscraper
+      - all
+    environment:
+      - FASTMCP_TRANSPORT=sse
+      - FASTMCP_PORT=7004
+      - FASTMCP_HOST=0.0.0.0
+    ports:
+      - "7004:7004"
+    networks:
+      - mcp-network
+
+  # ===========================================
+  # NCBI DATASETS MCP SERVER
+  # NCBI genomic datasets queries
+  # ===========================================
+  ncbi-datasets-mcp:
+    build:
+      context: ./NCBI-Datasets-MCP-Server
+      dockerfile: Dockerfile
+    container_name: ncbi-datasets-mcp
+    restart: unless-stopped
+    profiles:
+      - ncbi
+      - all
+    environment:
+      - NCBI_API_KEY=${NCBI_API_KEY}
+      - MCP_TRANSPORT=http
+      - MCP_PORT=7005
+    ports:
+      - "7005:7005"
+    networks:
+      - mcp-network
+
+  # ===========================================
+  # FILESYSTEM MCP SERVER
+  # File system access for data directory
+  # ===========================================
+  filesystem-mcp:
+    build:
+      context: ./rust-mcp-filesystem
+      dockerfile: Dockerfile
+    container_name: filesystem-mcp
+    restart: unless-stopped
+    profiles:
+      - filesystem
+    command: [ "rust-mcp-filesystem", "/workspace" ]
+    volumes:
+      - ${WORKSPACE_PATH}:/workspace:ro
+    networks:
+      - mcp-network
+
+  # ===========================================
+  # MCP DB SERVER
+  # PostgreSQL database connector
+  # ===========================================
+  mcp-db-server:
+    build:
+      context: ./mcp-db-server
+      dockerfile: Dockerfile
+    container_name: mcp-db-server
+    restart: unless-stopped
+    profiles:
+      - db
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./mcp-db-server/data:/data
+      - ./mcp-db-server/config:/app/config:ro
+    stdin_open: true
+    tty: true
+    healthcheck:
+      test: [ "CMD", "python", "-c", "import asyncio; import sys; sys.path.insert(0, 'app'); from db import DatabaseManager; dm = DatabaseManager(); print('OK' if asyncio.run(dm.test_connection()) else 'FAIL')" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - mcp-network
+
+networks:
+  mcp-network:
+    name: mcp-network
+    driver: bridge
