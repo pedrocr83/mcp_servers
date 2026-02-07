@@ -24,7 +24,7 @@ services:
         delay: 5s
     environment:
       - BRAVE_API_KEY=${BRAVE_API_KEY}
-      - BRAVE_MCP_TRANSPORT=http
+      # Wrapper uses stdio internally:
       - BRAVE_MCP_PORT=7000
       - BRAVE_MCP_HOST=0.0.0.0
       - BRAVE_MCP_LOG_LEVEL=info
