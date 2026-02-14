@@ -70,7 +70,7 @@ services:
     restart: unless-stopped
     profiles:
       - biolocal
-      - all
+      # all: excluded — ./bio_local has no Dockerfile/content yet
     environment:
       - FASTMCP_TRANSPORT=sse
       - FASTMCP_PORT=7002
