@@ -30,7 +30,7 @@ services:
       - BRAVE_MCP_LOG_LEVEL=info
     init: true
     ports:
-      - "7000:7000"
+      - "127.0.0.1:7000:7000"
     security_opt:
       - no-new-privileges:true
     networks:
@@ -55,7 +55,7 @@ services:
       - FASTMCP_PORT=7001
       - FASTMCP_HOST=0.0.0.0
     ports:
-      - "7001:7001"
+      - "127.0.0.1:7001:7001"
     networks:
       - mcp-network
 
@@ -80,7 +80,7 @@ services:
     volumes:
       - ${GENOME_DATA_PATH}:/data/genomes:ro
     ports:
-      - "7002:7002"
+      - "127.0.0.1:7002:7002"
     networks:
       - mcp-network
 
@@ -101,7 +101,7 @@ services:
       - PYTHONUNBUFFERED=1
       - PORT=7003
     ports:
-      - "7003:7003"
+      - "127.0.0.1:7003:7003"
     networks:
       - mcp-network
 
@@ -123,7 +123,7 @@ services:
       - FASTMCP_PORT=7004
       - FASTMCP_HOST=0.0.0.0
     ports:
-      - "7004:7004"
+      - "127.0.0.1:7004:7004"
     networks:
       - mcp-network
 
@@ -136,7 +136,7 @@ services:
       context: ./NCBI-Datasets-MCP-Server
       dockerfile: Dockerfile
     container_name: ncbi-datasets-mcp
-    restart: unless-stopped
+    restart: "no"
     profiles:
       - ncbi
       - all
@@ -145,7 +145,7 @@ services:
       - MCP_TRANSPORT=http
       - MCP_PORT=7005
     ports:
-      - "7005:7005"
+      - "127.0.0.1:7005:7005"
     networks:
       - mcp-network
 
