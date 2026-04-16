@@ -161,11 +161,12 @@ services:
     restart: unless-stopped
     profiles:
       - filesystem
-    command: [ "rust-mcp-filesystem", "/workspace" ]
+    entrypoint: ["sleep", "infinity"]
     volumes:
       - ${WORKSPACE_PATH}:/workspace:ro
     networks:
       - mcp-network
+      - mcp-network-llm
 
   # ===========================================
   # MCP DB SERVER
