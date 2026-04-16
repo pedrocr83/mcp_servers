@@ -11,7 +11,7 @@ services:
     build:
       context: ./brave-search-mcp-server
       dockerfile: Dockerfile
-    container_name: brave-search-mcp
+    container_name: brave-search-mcp-server
     restart: unless-stopped
     profiles:
       - brave
@@ -35,6 +35,7 @@ services:
       - no-new-privileges:true
     networks:
       - mcp-network
+      - mcp-network-llm
 
   # ===========================================
   # GNOMAD MCP SERVER
@@ -195,7 +196,129 @@ services:
     networks:
       - mcp-network
 
+  # ===========================================
+  # GHOSTLABS MCP SERVERS
+  # AI product suite tools
+  # ===========================================
+
+  # Phantom — Lead generation & email verification
+  ghostlabs-phantom-mcp:
+    build:
+      context: ./ghostlabs-phantom-mcp
+      dockerfile: Dockerfile
+    container_name: ghostlabs-phantom-mcp
+    restart: unless-stopped
+    profiles:
+      - ghostlabs
+      - phantom
+      - all
+    environment:
+      - PHANTOM_API_URL=${PHANTOM_API_URL:-http://phantom-backend:8000/api}
+      - PHANTOM_API_KEY=${PHANTOM_API_KEY:-}
+      - FASTMCP_TRANSPORT=sse
+      - FASTMCP_PORT=7010
+      - FASTMCP_HOST=0.0.0.0
+    ports:
+      - "7010:7010"
+    networks:
+      - mcp-network
+      - mcp-network-llm
+
+  # Whisper — Business intelligence & data queries
+  ghostlabs-whisper-mcp:
+    build:
+      context: ./ghostlabs-whisper-mcp
+      dockerfile: Dockerfile
+    container_name: ghostlabs-whisper-mcp
+    restart: unless-stopped
+    profiles:
+      - ghostlabs
+      - whisper
+      - all
+    environment:
+      - WHISPER_API_URL=${WHISPER_API_URL:-http://whisper-backend:8000/api}
+      - WHISPER_API_KEY=${WHISPER_API_KEY:-}
+      - FASTMCP_TRANSPORT=sse
+      - FASTMCP_PORT=7011
+      - FASTMCP_HOST=0.0.0.0
+    ports:
+      - "7011:7011"
+    networks:
+      - mcp-network
+      - mcp-network-llm
+
+  # Shroud — Security & compliance
+  ghostlabs-shroud-mcp:
+    build:
+      context: ./ghostlabs-shroud-mcp
+      dockerfile: Dockerfile
+    container_name: ghostlabs-shroud-mcp
+    restart: unless-stopped
+    profiles:
+      - ghostlabs
+      - shroud
+      - all
+    environment:
+      - SHROUD_API_URL=${SHROUD_API_URL:-http://shroud-backend:8000/api}
+      - SHROUD_API_KEY=${SHROUD_API_KEY:-}
+      - FASTMCP_TRANSPORT=sse
+      - FASTMCP_PORT=7012
+      - FASTMCP_HOST=0.0.0.0
+    ports:
+      - "7012:7012"
+    networks:
+      - mcp-network
+      - mcp-network-llm
+
+  # Specter — Adversarial strategy analysis
+  ghostlabs-specter-mcp:
+    build:
+      context: ./ghostlabs-specter-mcp
+      dockerfile: Dockerfile
+    container_name: ghostlabs-specter-mcp
+    restart: unless-stopped
+    profiles:
+      - ghostlabs
+      - specter
+      - all
+    environment:
+      - SPECTER_API_URL=${SPECTER_API_URL:-http://specter-backend:8000/api}
+      - SPECTER_API_KEY=${SPECTER_API_KEY:-}
+      - FASTMCP_TRANSPORT=sse
+      - FASTMCP_PORT=7013
+      - FASTMCP_HOST=0.0.0.0
+    ports:
+      - "7013:7013"
+    networks:
+      - mcp-network
+      - mcp-network-llm
+
+  # Skills Engine — Shared skill discovery & loading
+  ghostlabs-skills-mcp:
+    build:
+      context: ./ghostlabs-skills-mcp
+      dockerfile: Dockerfile
+    container_name: ghostlabs-skills-mcp
+    restart: unless-stopped
+    profiles:
+      - ghostlabs
+      - skills
+      - all
+    environment:
+      - SKILLS_API_URL=${SKILLS_API_URL:-http://ghostlabs-backend:8000/api}
+      - FASTMCP_TRANSPORT=sse
+      - FASTMCP_PORT=7014
+      - FASTMCP_HOST=0.0.0.0
+    ports:
+      - "7014:7014"
+    networks:
+      - mcp-network
+      - mcp-network-llm
+
 networks:
   mcp-network:
     name: mcp-network
-    driver: bridge
+    external: true
+  mcp-network-llm:
+    name: mcp-network-llm
+    external: true
