@@ -163,7 +163,9 @@ services:
       - filesystem
     entrypoint: ["sleep", "infinity"]
     volumes:
-      - ${WORKSPACE_PATH}:/workspace:ro
+      - ${GHOSTLABS_DOCS_PATH:-/home/pedro/Desktop/Business/AI/ghostlabs_docs}:/workspace/ghostlabs_docs:ro
+      - ${GHOSTLABS_PATH:-/home/pedro/Desktop/Business/AI/ghostlabs}:/workspace/ghostlabs:ro
+      - ${GHOSTLABS_INFRA_PATH:-/home/pedro/Desktop/Business/AI/ghostlabs_infra}:/workspace/ghostlabs_infra:ro
     networks:
       - mcp-network
       - mcp-network-llm
