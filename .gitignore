@@ -14,7 +14,6 @@ genome_mcp/
 paperscraper_mcp/
 NCBI-Datasets-MCP-Server/
 mcp-db-server/
-rust-mcp-filesystem/
 bio_local/
 
 # Python
